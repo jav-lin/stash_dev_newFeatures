@@ -25,6 +25,11 @@ Supported Features:
 
 --filename_parser: WIP. Idea is to add more complex parsing logic for custom use cases.
 
+--issue_86: custom parser for stash_vr issue 86 https://github.com/o-fl0w/stash-vr/issues/86 to help people find the bad file due to date formatting that crashes
+    Heresphere. Will dump the file name(s) so you can update the date manually as there is no good way to hunt for this with the GUI in big libraries. Follow setup
+    steps below then run the following command.
+    python3 ./stash_server_updater.py --issue_86
+
 Setup:
 1. pip install "gql==3.4.1" . Must use this older version.
 2. Create 4x helper tags via the stash gui: "to_delete", "deleted", "to_img", "processing".

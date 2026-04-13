@@ -256,15 +256,11 @@ class StashUtils:
           }
           """)
         self.sceneUpdate_rating = gql("""
-          mutation sceneUpdate($scene_id: ID!, $tag_id_str: [ID!]) {
-            sceneUpdate(input: {id: $scene_id, tag_ids: $tag_id_str}) {
+          mutation sceneUpdate($scene_id: ID!) {
+            sceneUpdate(input: {id: $scene_id, rating100: 10}) {
               id
               files {
                 path
-              }
-              tags {
-                id
-                name
               }
             }
           }
@@ -364,6 +360,15 @@ class StashUtils:
 
       return self.send_query(query=self.my_mutations["sceneUpdate_by_tag_id"], 
                                           var_dict={"scene_id": scene["id"], "tag_id_str": tag_id_list})
+    
+    def update_scene_rating(self, scene):
+      """
+      Changes rating to 10/100
+      @param scene scene: json response from query findScenes
+      """
+
+      return self.send_query(query=self.my_mutations["sceneUpdate_rating"], 
+                                          var_dict={"scene_id": scene["id"]})
     
     def parse_tags_to_int_list(self, scene):
         """
@@ -500,6 +505,7 @@ class StashUtils:
                 for scene in to_delete_scenes["findScenes"]["scenes"]:
                     self.update_scene_tags(scene=scene, tags_to_add=[self.tag_id["DELETED"]], 
                                            tags_to_delete=[self.tag_id["TO_DELETE"]])
+                    self.update_scene_rating(scene=scene)
                     # delete file
                     print(scene["files"][0]["path"])
                     file_count += 1
@@ -507,7 +513,6 @@ class StashUtils:
                         os.remove(scene["files"][0]["path"])
                     except:
                         print("^^^File not found!")
-                    else:
             else:
                 to_delete_found = False
                 print("{} new files deleted".format(file_count))

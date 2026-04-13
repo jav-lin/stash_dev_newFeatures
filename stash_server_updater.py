@@ -76,10 +76,10 @@ class StashUtils:
             "Content-Type" : "application/json"
         }
         self.tag_id = {
-          "DELETED": 2,
-          "TO_DELETE": 24,
-          "TO_IMG": 39,
-          "PROCESSING": 120
+          "TO_DELETE": 1817,
+          "DELETED": 1818,
+          "TO_IMG": 1819,
+          "PROCESSING": 1820
         
         }
         self.creator_dir = "/mnt/wd_red/2d/img/private/creator"
@@ -255,6 +255,20 @@ class StashUtils:
             }
           }
           """)
+        self.sceneUpdate_rating = gql("""
+          mutation sceneUpdate($scene_id: ID!, $tag_id_str: [ID!]) {
+            sceneUpdate(input: {id: $scene_id, tag_ids: $tag_id_str}) {
+              id
+              files {
+                path
+              }
+              tags {
+                id
+                name
+              }
+            }
+          }
+          """)
         self.sceneUpdate_multiple= gql("""
           mutation sceneUpdate($scene_id: ID!, $studio_id: ID, $title: String, $performer_ids: [ID!]) {
             sceneUpdate(
@@ -318,6 +332,7 @@ class StashUtils:
           """)
         self.my_mutations = {
             "sceneUpdate_by_tag_id" : self.sceneUpdate_by_tag_id,
+            "sceneUpdate_rating" : self.sceneUpdate_rating,
             "sceneUpdate_multiple": self.sceneUpdate_multiple,
             "imageUpdate_with_performer": self.imageUpdate_with_performer,
             "studioCreate_by_name": self.studioCreate_by_name,
@@ -488,7 +503,11 @@ class StashUtils:
                     # delete file
                     print(scene["files"][0]["path"])
                     file_count += 1
-                    os.remove(scene["files"][0]["path"])
+                    try:
+                        os.remove(scene["files"][0]["path"])
+                    except:
+                        print("^^^File not found!")
+                    else:
             else:
                 to_delete_found = False
                 print("{} new files deleted".format(file_count))
